@@ -13,6 +13,5 @@ Future<void> main() async {
   await Supabase.initialize(url: url, anonKey: anonKey);
   // await dotenv.load();
 
-
   runApp(const MyApp());
 }
