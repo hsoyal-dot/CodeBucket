@@ -3,7 +3,6 @@ import 'package:leetsave/core/themes/app_colors.dart' show AppColors1;
 import 'package:leetsave/core/themes/app_textstyle.dart' show AppTextStyles1;
 import 'package:leetsave/presentation/home/widgets/bucket_section.dart';
 import 'package:leetsave/presentation/home/widgets/link_section.dart';
-import 'package:leetsave/presentation/home/widgets/save_bucket_dialog.dart';
 import 'package:leetsave/presentation/home/widgets/user_icon.dart';
 
 class HomePage extends StatefulWidget {
@@ -27,7 +26,7 @@ class _HomePageState extends State<HomePage> {
             IconButton(
               icon: userIcon,
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/profile');
+                Navigator.pushNamed(context, '/profile');
               },
             ),
           ],
@@ -37,7 +36,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           // LEFT SECTION
           LinkSection(),
-          
+
           // RIGHT SECTION
           BucketSection(),
         ],
