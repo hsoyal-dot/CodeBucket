@@ -37,7 +37,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   supabase_flutter: ^2.9.1
   google_fonts: ^6.2.1
-  cached_network_image: ^3.4.1
+  video_player: ^2.10.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -66,9 +66,10 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/videos/bg.mp4
+    - assets/videos/bg.webm
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
