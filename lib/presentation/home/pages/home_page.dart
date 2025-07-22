@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Leetsave', style: AppTextStyles1.appBarStyle),
+            Text('CodeBucket', style: AppTextStyles1.appBarStyle),
             IconButton(
               icon: userIcon,
               onPressed: () {

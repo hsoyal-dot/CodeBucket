@@ -17,12 +17,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkSession() async {
     final session = Supabase.instance.client.auth.currentSession;
+    final expiresAt = session?.expiresAt;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      if (session != null) {
+      if (session != null && expiresAt != null && expiresAt * 1000 > DateTime.now().millisecondsSinceEpoch) {
         Navigator.pushReplacementNamed(context, '/signed_in');
       } else {
+        // await Supabase.instance.client.auth.signOut();
         Navigator.pushReplacementNamed(context, '/');
       }
     });
