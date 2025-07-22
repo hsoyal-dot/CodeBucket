@@ -140,7 +140,7 @@ class _SaveBucketDialogState extends State<SaveBucketDialog> {
   Future<void> _showConfirmationDialog(String bucketName) async {
     String confirmationText = '';
     bool isError = false;
-    final showBucketName = bucketName.substring(0, 5);
+    final showBucketName = bucketName.substring(0, bucketName.length).toUpperCase();
 
     await showDialog(
       context: context,
@@ -198,7 +198,7 @@ class _SaveBucketDialogState extends State<SaveBucketDialog> {
                     }
                   },
                   style: AppTextStyles1.elevButtonSuccess,
-                  child: Text('Create $showBucketName...'),
+                  child: Text('Create \'$showBucketName\''),
                 ),
               ],
             );

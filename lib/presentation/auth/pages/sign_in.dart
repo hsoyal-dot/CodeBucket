@@ -22,7 +22,7 @@ class SignIn extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Leetsave', style: AppTextStyles1.headingLarge),
+                Text('CodeBucket', style: AppTextStyles1.headingLarge),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.login),
