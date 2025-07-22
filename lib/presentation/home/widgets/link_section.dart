@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:leetsave/common/widgets/get_platform_icon.dart';
 import 'package:leetsave/core/themes/app_colors.dart';
 import 'package:leetsave/core/themes/app_textstyle.dart';
 import 'package:leetsave/domain/entities/response_data.dart';
 import 'package:leetsave/domain/usecases/fetch_response.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:leetsave/presentation/home/widgets/save_bucket_dialog.dart';
 
 class LinkSection extends StatefulWidget {
@@ -45,24 +47,50 @@ class _LinkSectionState extends State<LinkSection> {
               const SizedBox(height: 20),
 
               if (showResults)
-                AnimatedOpacity(
-                  duration: Duration(milliseconds: 500),
-                  opacity: 1,
-                  child: Container(
-                    height: 200,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppColors1.surface,
-                      borderRadius: BorderRadius.circular(7),
-                      border: Border.all(color: AppColors1.primary),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: AppColors1.primary.withValues(alpha: 0.3),
                     ),
-                    child: Center(
-                      child: Text(
-                        'Preview of:\n${_linkController.text.trim()}',
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles1.body,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          getPlatformIcon(_linkController.text.trim()),
+                          const SizedBox(width: 8),
+                          Text(
+                            Uri.tryParse(_linkController.text.trim())?.host ??
+                                'Preview Unavailable',
+                            style: AppTextStyles1.body.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                      TextButton.icon(
+                        onPressed: () async {
+                          final uri = Uri.parse(_linkController.text.trim());
+                          if (!await launchUrl(
+                            uri,
+                            mode: LaunchMode.externalApplication,
+                          )) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Failed to open link'),
+                              ),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.open_in_new),
+                        label: const Text('Open'),
+                      ),
+                    ],
                   ),
                 ),
               const SizedBox(height: 20),
@@ -98,7 +126,9 @@ class _LinkSectionState extends State<LinkSection> {
                           existingBuckets: ['Binary Search', 'DP'], // dummy
                           onSave: (bucketName) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Saved to \'$bucketName\'')),
+                              SnackBar(
+                                content: Text('Saved to \'$bucketName\''),
+                              ),
                             );
                           },
                         ),
@@ -120,21 +150,25 @@ class _LinkSectionState extends State<LinkSection> {
                     ElevatedButton(
                       onPressed: () =>
                           setState(() => selectedField = 'approach'),
+                      style: AppTextStyles1.elevButtonNormal,
                       child: const Text('Approach'),
                     ),
                     ElevatedButton(
                       onPressed: () =>
                           setState(() => selectedField = 'explanation'),
+                      style: AppTextStyles1.elevButtonNormal,
                       child: const Text('Explanation'),
                     ),
                     ElevatedButton(
                       onPressed: () =>
                           setState(() => selectedField = 'timeComplexity'),
+                      style: AppTextStyles1.elevButtonNormal,
                       child: const Text('Time Complexity'),
                     ),
                     ElevatedButton(
                       onPressed: () =>
                           setState(() => selectedField = 'spaceComplexity'),
+                      style: AppTextStyles1.elevButtonNormal,
                       child: const Text('Space Complexity'),
                     ),
                   ],
