@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:leetsave/core/themes/app_colors.dart';
 import 'package:leetsave/core/themes/app_textstyle.dart';
+import 'package:leetsave/data/datasources/bucket_service.dart';
+import 'package:leetsave/data/datasources/problem_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SaveBucketDialog extends StatefulWidget {
   final List<String> existingBuckets;
   final Function(String bucketName) onSave;
+  final String title;
+  final String link;
+  final List<String> tags;
+  final VoidCallback? onComplete;
 
   const SaveBucketDialog({
     super.key,
     required this.existingBuckets,
     required this.onSave,
+    required this.title,
+    required this.link,
+    required this.tags,
+    this.onComplete,
   });
 
   @override
@@ -116,7 +127,7 @@ class _SaveBucketDialogState extends State<SaveBucketDialog> {
         ),
         // Save button
         ElevatedButton(
-          onPressed: () {
+          onPressed: () async {
             final bucket = isCreatingNew
                 ? _newBucketController.text.trim()
                 : selectedBucket;
@@ -125,7 +136,37 @@ class _SaveBucketDialogState extends State<SaveBucketDialog> {
               if (isCreatingNew) {
                 _showConfirmationDialog(bucket);
               } else {
+                final client = Supabase.instance.client;
+
+                final existingBucket = await client
+                    .from('buckets')
+                    .select('id')
+                    .eq('user_id', client.auth.currentUser!.id)
+                    .eq('name', bucket)
+                    .maybeSingle();
+
+                if (existingBucket == null) {
+                  await BucketService().createBucket(bucket);
+                }
+
+                final bucketData = await client
+                    .from('buckets')
+                    .select('id')
+                    .eq('user_id', client.auth.currentUser!.id)
+                    .eq('name', bucket)
+                    .single();
+
+                final bucketId = bucketData['id'];
+
+                await ProblemService().addProblem(
+                  bucketId: bucketId,
+                  title: widget.title,
+                  link: widget.link,
+                  tags: widget.tags,
+                );
+
                 widget.onSave(bucket);
+                widget.onComplete?.call();
                 Navigator.pop(context);
               }
             }
@@ -188,9 +229,27 @@ class _SaveBucketDialogState extends State<SaveBucketDialog> {
                   child: const Text('Back'),
                 ),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (confirmationText.trim().toUpperCase() == 'CREATE') {
-                      widget.onSave(bucketName);
+                      await BucketService().createBucket(bucketName);
+
+                      final bucketData = await Supabase.instance.client
+                          .from('buckets')
+                          .select('id')
+                          .eq('user_id', Supabase.instance.client.auth.currentUser!.id)
+                          .eq('name', bucketName)
+                          .single();
+
+                      final bucketId = bucketData['id'];
+
+                      await ProblemService().addProblem(
+                        bucketId: bucketId,
+                        title: widget.title,
+                        link: widget.link,
+                        tags: widget.tags,
+                      );
+
+                      widget.onComplete?.call();
                       Navigator.pop(context); // close confirmation dialog
                       Navigator.pop(context); // close main dialog
                     } else {
