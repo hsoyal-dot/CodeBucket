@@ -4,6 +4,7 @@ class ResponseData {
   final String spaceComplexity;
   final String explanation;
   final String approach;
+  final List<String> problemTags;
 
   ResponseData({
     required this.title,
@@ -11,6 +12,7 @@ class ResponseData {
     required this.spaceComplexity,
     required this.explanation,
     required this.approach,
+    this.problemTags = const [],
   });
 
   factory ResponseData.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class ResponseData {
       spaceComplexity: json['spaceComplexity'] ?? '',
       explanation: json['explanation'] ?? '',
       approach: json['approach'] ?? '',
+      problemTags: List<String>.from(json['problemTags'] ?? []),
     );
   }
 }

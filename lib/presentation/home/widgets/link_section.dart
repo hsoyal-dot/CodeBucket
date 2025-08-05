@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:leetsave/common/widgets/get_platform_icon.dart';
 import 'package:leetsave/core/themes/app_colors.dart';
 import 'package:leetsave/core/themes/app_textstyle.dart';
+import 'package:leetsave/data/datasources/bucket_service.dart';
 import 'package:leetsave/domain/entities/response_data.dart';
 import 'package:leetsave/domain/usecases/fetch_response.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:leetsave/presentation/home/widgets/save_bucket_dialog.dart';
 
 class LinkSection extends StatefulWidget {
-  const LinkSection({super.key});
+  final VoidCallback onRefreshBuckets;
+  const LinkSection({super.key, required this.onRefreshBuckets});
 
   @override
   State<LinkSection> createState() => _LinkSectionState();
@@ -19,6 +21,10 @@ class _LinkSectionState extends State<LinkSection> {
   bool isLoading = false;
   bool showResults = false;
   String? selectedField;
+
+  List<String> getTags() {
+    return cachedResponseData?.problemTags ?? [];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,18 +125,28 @@ class _LinkSectionState extends State<LinkSection> {
                   ),
                   const SizedBox(width: 16),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      final buckets = await BucketService().getBuckets();
+                      if (!context.mounted) return;
+
                       showDialog(
                         context: context,
                         builder: (_) => SaveBucketDialog(
-                          existingBuckets: ['Binary Search', 'DP'], // dummy
-                          onSave: (bucketName) {
+                          existingBuckets: buckets.map((b) => b.name).toList(),
+                          title: cachedResponseData?.title ?? 'Untitled',
+                          link: _linkController.text.trim(),
+                          tags: getTags(),
+                          onSave: (bucketName) async {
+                            if (!mounted) return;
+
+                            widget.onRefreshBuckets();
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Saved to \'$bucketName\''),
                               ),
                             );
                           },
+                          onComplete: widget.onRefreshBuckets,
                         ),
                       );
                     },
