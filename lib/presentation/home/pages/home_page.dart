@@ -40,13 +40,35 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: Row(
-        children: [
-          // LEFT SECTION
-          LinkSection(onRefreshBuckets: refreshBuckets),
-          // RIGHT SECTION
-          BucketSection(),
-        ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth > 700) {
+            //DESKTOP
+            return Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  //LEFT SECTION
+                  child: LinkSection(onRefreshBuckets: refreshBuckets),
+                ),
+                //RIGHT SECTION
+                Expanded(flex: 2, child: BucketSection()),
+              ],
+            );
+          } else {
+            // MOBILE
+            return ListView(
+              padding: const EdgeInsets.all(8),
+              children: [
+                //LEFT SECTION
+                LinkSection(onRefreshBuckets: refreshBuckets),
+                const SizedBox(height: 16),
+                //RIGHT SECTION
+                BucketSection(),
+              ],
+            );
+          }
+        },
       ),
     );
   }

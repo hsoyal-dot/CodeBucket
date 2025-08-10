@@ -39,7 +39,9 @@ class BucketSectionState extends State<BucketSection> {
           final problems = await ProblemService().getProblems(bucketId);
           problemsMap[bucketName] = problems;
         } catch (e) {
-          print('Error getting problems for bucket $bucketName: $e'); //debugging purpose
+          print(
+            'Error getting problems for bucket $bucketName: $e',
+          ); //debugging purpose
         }
       }
 
@@ -57,40 +59,50 @@ class BucketSectionState extends State<BucketSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      flex: 2,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        color: AppColors1.surface,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Your Buckets', style: AppTextStyles1.section),
-            const SizedBox(height: 16),
-            if (isLoading)
-              const Center(child: CircularProgressIndicator())
-            else if (buckets.isEmpty)
-              Flexible(
-                child: Center(
-                  child: Lottie.asset('assets/lottie/empty.json', width: 200),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          color: AppColors1.surface,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Your Buckets', style: AppTextStyles1.section),
+              const SizedBox(height: 16),
+              if (isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (buckets.isEmpty)
+                Expanded(
+                  child: Center(
+                    child: Lottie.asset('assets/lottie/empty.json', width: 200),
+                  ),
+                )
+              else
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: buckets.length,
+                    itemBuilder: (context, index) {
+                      final bucket = buckets[index];
+                      return Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: isMobile ? 8 : 12,
+                          horizontal: isMobile ? 4 : 12,
+                        ),
+                        child: BucketTile(
+                          name: bucket.name,
+                          problems: (bucketProblems[bucket.name] ?? []),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              )
-            else
-              Expanded(
-                child: ListView.builder(
-                  itemCount: buckets.length,
-                  itemBuilder: (context, index) {
-                    final bucket = buckets[index];
-                    return BucketTile(
-                      name: bucket.name,
-                      problems: (bucketProblems[bucket.name] ?? []),
-                    );
-                  },
-                ),
-              ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
